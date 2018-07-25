@@ -18,6 +18,77 @@ class IndexViews(ListView):
 	model = Post
 	template_name = 'blog/index.html'
 	context_object_name = 'post_list'
+	# 指定 paginate_by 属性后开启分页功能,其值代表每一页包含的文章数
+	paginate_by = 1
+
+	def get_context_data(self, **kwargs):
+		'''
+		在视图函数中将模板变量传递给模板是通过给 render 函数的 context 参数传递一个字典实现的,
+		例如 render(request, 'blog/index.html', context={'post_list': post_list}),
+		这里传递了一个 {'post_list': post_list} 字典给模板.
+		在类视图中,这个需要传递的模板变量字典是通过 get_context_data 方法获得的,
+		所以我们覆写该方法,以便我们能够自己再插入一些我们自定义的变量进去.
+		'''
+
+		# 首先获得父类生成的传递给模板的字典
+		context = super().get_context_data(**kwargs)
+
+		'''
+		父类生成的字典中已有了 paginator/page_obj/is_paginated 这三个模板变量
+		paginator 是 Paginator 的一个实例(分页实例)
+		page_obj 是 Page 的一个实例(当前分页实例)
+		is_paginated 是一个布尔变量,指示是否分页
+		由于 context 是一个字典,所以用 get 方法从中取出某个键对应的值
+		'''
+		paginator = context.get('paginator')
+		page = context.get('page_obj')
+		is_paginated = context.get('is_paginated')
+
+		# 调用自己写的 pagination_data 方法获得显示分页导航条需要得数据
+		pagination_data = self.pagination_data(paginator, page, is_paginated)
+
+		# 将分页导航条的模板变量更新到 context 中,注意 pagination_data 方法返回的也是一个字典
+		context.update(pagination_data)
+
+		# 将更新后的 context 返回,以便 ListView 使用这个字典中的模板变量去渲染模板.
+		# 注意此时 context 字典中已有了显示分页导航条所需的数据
+		return context
+
+		def pagination_data(self, paginator, page, is_paginated):
+			if not is_paginated:
+				return {}
+			# 当前页左边连续的页码号,初始值为空
+			left = []
+			# 当前页右边连续的页码数,初始值为空
+			right = []
+			# 标示第一页页码后是否需要显示省略号
+			left_has_more = False
+			# 标示最后一页页码前是否需要显示省略号
+			right_has_more = False
+			# 标示是否需要显示最后一页页码号
+			# 因为如果当前页左边的连续页码中已经含有第一页的页码,此时就无需再显示第一页的页码了
+			# 其他情况下第一页页码默认显示
+			# 初始值为 False
+			first = False
+			# 同上,标示变量
+			last = False
+
+			# 获得用户当前请求的页码数
+			page_number = page.number
+
+			# 获得分页后的总页数
+			total_pages = paginator.num_pages
+
+			# 获得整个分页页码列表, 比如分了4页,那就是[1, 2, 3, 4]
+			page_range = paginator.page_range
+
+			if page_number == 1:
+				'''
+				如果用户当前请求第一页,那么当前页左边就不需要数据,因此left = [](默认)
+				此时只需要获取当前页右边的连续页码数, right = [2, 3, 4, 5]
+				后面的数字表示截取的范围
+				'''
+				right = page_range[page_number:page_number + 2]
 
 
 # def posts(request):
@@ -82,9 +153,9 @@ class PostDetailView(DetailView):
 		return responese
 
 	# 对应 detail 视图函数中根据 pk(id) 获取文章,然后对文章的 post.body 进行 markdown 渲染
-	def get_object(self, querset=None):
+	def get_object(self, queryset=None):
 		# 覆写 get_object 方法为了对 post.body 进行 markdown 渲染
-		post = super(PostDetailView, self).get_object(querset=None)
+		post = super(PostDetailView, self).get_object(queryset=None)
 		post.body = markdown.markdown(post.body,
 									  extensions=[
 										  'markdown.extensions.extra',
