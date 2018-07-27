@@ -21,7 +21,7 @@ class IndexViews(ListView):
     template_name = 'blog/index.html'
     context_object_name = 'post_list'
     # 指定 paginate_by 属性后开启分页功能,其值代表每一页包含的文章数
-    paginate_by = 7
+    paginate_by = 5
 
     def get_context_data(self, **kwargs):
         '''
