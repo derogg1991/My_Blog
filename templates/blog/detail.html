@@ -8,7 +8,7 @@
                             <span class="post-date"><a href="{% url 'blog:archives' post.created_time.year post.created_time.month %}"><time class="entry-date"
                                                                       datetime="{{ post.created_time }}">{{ post.created_time }}</time></a></span>
                             <span class="post-author"><a href="{% url 'blog:author' post.author.pk %}">{{ post.author }}</a></span>
-                            <span class="comments-link"><a href="#">4 评论</a></span>
+                            <!-- <span class="comments-link"><a href="#">4 评论</a></span> -->
                             <span class="views-count"><a href="{{ post.get_absolute_url }}">{{ post.views }} 阅读</a></span>
                         </div>
                     </header>
@@ -17,7 +17,7 @@
                         {{ post.body|safe }}
                     </div>
                 </article>
-                <section class="comment-area" id="comment-area">
+<!--                 <section class="comment-area" id="comment-area">
                     <hr>
                     <h3>发表评论</h3>
                     <form action="{% url 'comments:post_comment' post.pk %}" method="post" class="comment-form">
@@ -44,8 +44,8 @@
                                 {{ fom.text }}
                                 <button type="submit" class="comment-btn">发表</button>
                             </div>
-                        </div>    <!-- row -->
-                    </form>
+                        </div> -->    <!-- row -->
+<!--                     </form>
                     <div class="comment-list-panel">
                         <h3>评论列表，共 <span>{{ post.comment_set.count }}</span> 条评论</h3>
                         <ul class="comment-list list-unstyled">
@@ -62,7 +62,7 @@
                             {% endfor %}
                         </ul>
                     </div>
-                </section>
+                </section> -->
     {% endblock main %}
             <aside class="col-md-4">
                 {% block toc %}
