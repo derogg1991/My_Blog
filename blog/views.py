@@ -255,13 +255,13 @@ def archives(request, year, month):
 
 class ArchivesViews(ListView):
 	model = Post
-	template_name = 'blog/full-width.html'
+	template_name = 'blog/index.html'
 	context_object_name = 'post_list'
 
 	def get_queryset(self):
 		year = self.kwargs.get('year')
 		month = self.kwargs.get('month')
-		return super(ArchivesViews, self).get_queryset().filter(created_time__year=year, created_time__month=month).order_by('-created_time')
+		return super(ArchivesViews, self).get_queryset().filter(created_time__icontains="%s-0%s" %(year, month)).order_by('-created_time')
 
 
 '''
