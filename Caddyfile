@@ -1,0 +1,10 @@
+anthing.cn {
+  proxy / localhost:8000 {
+    except /static
+    transparent
+  }
+}
+anthing.cn/static {
+  root /root/My_Blog/MYblog/static
+  gzip
+}
